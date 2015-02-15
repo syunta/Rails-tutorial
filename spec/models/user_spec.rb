@@ -45,6 +45,7 @@ describe User do
         example.user@foo
         foo@bar_baz.com
         foo@bar+baz.com
+        doubledot@example..com
       ]
       addresses.each do |invalid_address|
         @user.email = invalid_address
