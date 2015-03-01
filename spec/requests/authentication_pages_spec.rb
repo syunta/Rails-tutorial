@@ -10,11 +10,11 @@ describe "Authentication" do
       before { click_button "Sign in" }
 
       it { should have_content('Sign in') }
-      it { should have_selector('div.alert.alert-error', text: 'invalid') }
+      it { should have_error_message('invalid') }
 
       describe "after visiting another page" do
         before { click_link "Home" }
-        it { should_not have_selector('div.alert.alert-error') }
+        it { should_not have_error_message('invalid') }
       end
     end
 
