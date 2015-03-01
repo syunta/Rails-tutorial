@@ -57,8 +57,8 @@ describe "UserPages" do
         before { click_button submit }
         let(:user) { User.find_by(email: test_email) }
 
-        it { should have_selector('div.alert.alert-success', text: 'Welcome') }
         it { should redirect_to_page_owned_by(user) }
+        it { should have_success_message('Welcome') }
 
         describe "followed by signout" do
           before { click_link "Sign out" }
