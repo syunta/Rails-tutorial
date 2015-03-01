@@ -18,7 +18,7 @@ RSpec::Matchers.define :have_success_message do |message|
   end
 end
 
-RSpec::Matchers.define :redirect_to_page_owned_by do |user|
+RSpec::Matchers.define :have_user_page_contents_owned_by do |user|
   match do |page|
     expect(page).to have_title(user.name)
     expect(page).to have_content(user.name)
