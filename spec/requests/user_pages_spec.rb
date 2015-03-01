@@ -41,9 +41,10 @@ describe "UserPages" do
     end
 
     describe "with valid information" do
+      let(:test_email) { "user@example.com" }
       before do
         fill_in "Name",         with: "Example User"
-        fill_in "Email",        with: "user@example.com"
+        fill_in "Email",        with: test_email
         fill_in "Password",     with: "foobar"
         fill_in "Confirmation", with: "foobar"
       end
@@ -54,7 +55,7 @@ describe "UserPages" do
 
       describe "after saving the user" do
         before { click_button submit }
-        let(:user) { User.find_by(email: 'user@example.com') }
+        let(:user) { User.find_by(email: test_email) }
 
         it { should have_selector('div.alert.alert-success', text: 'Welcome') }
         it { should redirect_to_page_owned_by(user) }
