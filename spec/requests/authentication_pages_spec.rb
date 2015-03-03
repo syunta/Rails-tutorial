@@ -23,6 +23,7 @@ describe "Authentication" do
       before { valid_signin(user) }
 
       it { should have_user_page_contents_owned_by(user) }
+      it { should have_link('Users', href: users_path) }
       it { should_not have_link('Sign in', href: signin_path) }
     end
   end
