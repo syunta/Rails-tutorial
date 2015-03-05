@@ -60,8 +60,8 @@ describe "UserPages" do
     let(:user) { FactoryGirl.create(:user) }
     before { visit user_path(user) }
 
-    it { should have_content(user.name) }
-    it { should have_title(user.name) }
+    it { should have_user_page_contents_owned_by(user) }
+    it { should_not have_private_contents_owned_by(user) }
   end
 
   describe "signup" do
