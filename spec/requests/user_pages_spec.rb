@@ -54,6 +54,16 @@ describe "UserPages" do
 
     it { should have_content('Sign up')}
     it { should have_title(full_title('Sign up'))}
+
+    describe "with signing in" do
+      let(:user) { FactoryGirl.create(:user) }
+      before {
+        sign_in user
+        visit root_path
+      }
+      it { should have_title('') }
+      it { should have_content('Sample App') }
+    end
   end
 
   describe "profile page" do
@@ -112,6 +122,15 @@ describe "UserPages" do
           it { should have_link('Sign in') }
         end
       end
+    end
+
+    describe "with signing in" do
+      let(:user) { FactoryGirl.create(:user) }
+      before do
+        sign_in user, no_capybara: true
+        post users_path(user)
+      end
+      it { expect(response).to redirect_to(root_url) }
     end
   end
 
