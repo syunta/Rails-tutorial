@@ -22,6 +22,11 @@ RSpec::Matchers.define :have_user_page_contents_owned_by do |user|
   match do |page|
     expect(page).to have_title(user.name)
     expect(page).to have_content(user.name)
+  end
+end
+
+RSpec::Matchers.define :have_private_contents_owned_by do |user|
+  match do |page|
     expect(page).to have_link('Profile', href: user_path(user))
     expect(page).to have_link('Settings', href: edit_user_path(user))
     expect(page).to have_link('Sign out', href: signout_path)

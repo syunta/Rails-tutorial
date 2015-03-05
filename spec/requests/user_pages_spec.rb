@@ -104,6 +104,7 @@ describe "UserPages" do
         let(:user) { User.find_by(email: test_email) }
 
         it { should have_user_page_contents_owned_by(user) }
+        it { should have_private_contents_owned_by(user) }
         it { should have_success_message('Welcome') }
 
         describe "followed by signout" do
