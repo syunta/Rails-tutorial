@@ -89,10 +89,10 @@ describe "UserPages" do
     describe "with valid information" do
       let(:test_email) { "user@example.com" }
       before do
-        fill_in "Name",         with: "Example User"
-        fill_in "Email",        with: test_email
-        fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "foobar"
+        fill_in "Name",             with: "Example User"
+        fill_in "Email",            with: test_email
+        fill_in "Password",         with: "foobar"
+        fill_in "Confirm Password", with: "foobar"
       end
 
       it "should create a user" do
