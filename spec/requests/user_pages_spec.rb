@@ -45,6 +45,17 @@ describe "UserPages" do
           end.to change(User, :count).by(-1)
         end
         it { should_not have_link('delete', href: user_path(admin)) }
+
+        describe "when deleting admin user" do
+          before do
+            sign_in admin, no_capybara: true
+          end
+          it "should not be able to delete admin user" do
+            expect do
+              delete user_path(admin)
+            end.to change(User, :count).by(0)
+          end
+        end
       end
     end
   end
