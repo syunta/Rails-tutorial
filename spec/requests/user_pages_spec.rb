@@ -45,6 +45,17 @@ describe "UserPages" do
           end.to change(User, :count).by(-1)
         end
         it { should_not have_link('delete', href: user_path(admin)) }
+
+        describe "when deleting admin user" do
+          before do
+            sign_in admin, no_capybara: true
+          end
+          it "should not be able to delete admin user" do
+            expect do
+              delete user_path(admin)
+            end.to change(User, :count).by(0)
+          end
+        end
       end
     end
   end
@@ -54,14 +65,24 @@ describe "UserPages" do
 
     it { should have_content('Sign up')}
     it { should have_title(full_title('Sign up'))}
+
+    describe "with signing in" do
+      let(:user) { FactoryGirl.create(:user) }
+      before {
+        sign_in user
+        visit root_path
+      }
+      it { should have_title('') }
+      it { should have_content('Sample App') }
+    end
   end
 
   describe "profile page" do
     let(:user) { FactoryGirl.create(:user) }
     before { visit user_path(user) }
 
-    it { should have_content(user.name) }
-    it { should have_title(user.name) }
+    it { should have_user_page_contents_owned_by(user) }
+    it { should_not have_private_contents_owned_by(user) }
   end
 
   describe "signup" do
@@ -89,10 +110,10 @@ describe "UserPages" do
     describe "with valid information" do
       let(:test_email) { "user@example.com" }
       before do
-        fill_in "Name",         with: "Example User"
-        fill_in "Email",        with: test_email
-        fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "foobar"
+        fill_in "Name",             with: "Example User"
+        fill_in "Email",            with: test_email
+        fill_in "Password",         with: "foobar"
+        fill_in "Confirm Password", with: "foobar"
       end
 
       it "should create a user" do
@@ -104,6 +125,7 @@ describe "UserPages" do
         let(:user) { User.find_by(email: test_email) }
 
         it { should have_user_page_contents_owned_by(user) }
+        it { should have_private_contents_owned_by(user) }
         it { should have_success_message('Welcome') }
 
         describe "followed by signout" do
@@ -111,6 +133,15 @@ describe "UserPages" do
           it { should have_link('Sign in') }
         end
       end
+    end
+
+    describe "with signing in" do
+      let(:user) { FactoryGirl.create(:user) }
+      before do
+        sign_in user, no_capybara: true
+        post users_path(user)
+      end
+      it { expect(response).to redirect_to(root_url) }
     end
   end
 
@@ -149,6 +180,18 @@ describe "UserPages" do
       it { should have_link('Sign out', href: signout_path) }
       specify { expect(user.reload.name).to eq new_name }
       specify { expect(user.reload.email).to eq new_email }
+    end
+    
+    describe "forbidden attributes" do
+      let(:params) do
+        { user: { admin: true, password: user.password,
+                  password_confirmation: user.password } }
+      end
+      before do
+        sign_in user, no_capybara: true
+        patch user_path(user), params
+      end
+      specify { expect(user.reload).not_to be_admin }
     end
   end
 end
