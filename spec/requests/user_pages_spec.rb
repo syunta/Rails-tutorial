@@ -57,6 +57,16 @@ describe "UserPages" do
           end
         end
       end
+
+      describe "as a normal user" do
+        let(:other) { FactoryGirl.create(:user) }
+        before do
+          sign_in user
+          visit users_path(other)
+        end
+
+        it { should_not have_link('delete', href: user_path(User.first)) }
+      end
     end
   end
 
