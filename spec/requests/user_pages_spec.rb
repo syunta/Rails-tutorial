@@ -57,6 +57,16 @@ describe "UserPages" do
           end
         end
       end
+
+      describe "as a normal user" do
+        let(:other) { FactoryGirl.create(:user) }
+        before do
+          sign_in user
+          visit users_path(other)
+        end
+
+        it { should_not have_link('delete', href: user_path(User.first)) }
+      end
     end
   end
 
@@ -79,10 +89,35 @@ describe "UserPages" do
 
   describe "profile page" do
     let(:user) { FactoryGirl.create(:user) }
+    let!(:m1) { FactoryGirl.create(:micropost, user: user, content: "Foo") }
+    let!(:m2) { FactoryGirl.create(:micropost, user: user, content: "Bar") }
+
     before { visit user_path(user) }
 
     it { should have_user_page_contents_owned_by(user) }
     it { should_not have_private_contents_owned_by(user) }
+
+    describe "microposts" do
+      it { should have_content(m1.content) }
+      it { should have_content(m2.content) }
+      it { should have_content(user.microposts.count) }
+
+      describe "pagination" do
+        before do
+          31.times { FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum") }
+          sign_in user
+          visit user_path(user)
+        end
+
+        it { should have_selector('div.pagination') }
+
+        it "should list each micropost" do
+          user.microposts.paginate(page: 1).each do |micropost|
+            expect(page).to have_selector('li', text: micropost.content)
+          end
+        end
+      end
+    end
   end
 
   describe "signup" do

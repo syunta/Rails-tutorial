@@ -16,6 +16,63 @@ describe "Static pages" do
 
     it_should_behave_like "all static pages"
     it { should_not have_title('| Home') }
+
+    describe "for signed-in users" do
+      let(:user) { FactoryGirl.create(:user) }
+
+      describe "in the side bar" do
+        describe "with one micropost" do
+          before do
+            FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
+            sign_in user
+            visit root_path
+          end
+          it { should have_selector('span', text: "1 micropost") }
+          it { should_not have_selector('span', text: "microposts") }
+        end
+
+        describe "with many microposts" do
+          before do
+            FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
+            FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
+            sign_in user
+            visit root_path
+          end
+          it { should have_selector('span', text: "2 microposts") }
+        end
+      end
+
+      describe "in the main content" do
+        before do
+          FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
+          FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
+          sign_in user
+          visit root_path
+        end
+
+        it "should render the user's feed" do
+          user.feed.each do |item|
+            expect(page).to have_selector("li##{item.id}", text: item.content)
+          end
+        end
+
+        describe "pagination" do
+          before do
+            31.times { FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum") }
+            sign_in user
+            visit root_path
+          end
+
+          it { should have_selector('div.pagination') }
+
+          it "should list each micropost" do
+            user.microposts.paginate(page: 1).each do |micropost|
+              expect(page).to have_selector('li', text: micropost.content)
+            end
+          end
+        end
+      end
+    end
   end
 
   describe "Help page" do
